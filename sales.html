@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RigFlip - Sales History</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="sales">
+  <header>
+    <div class="logo">
+      <h1>🖥️ RigFlip Tracker</h1>
+    </div>
+    <nav>
+      <a href="index.html">Inventory</a>
+      <a href="expenses.html">Expenses</a>
+      <a href="pcs.html">Built PCs</a>
+      <a href="sales.html">Sales History</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h2>Sales History & Profit Ledger</h2>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Total Revenue</h3>
+        <div class="val" id="total-revenue">$0.00</div>
+      </div>
+      <div class="stat-card">
+        <h3>Total Net Profit</h3>
+        <div class="val" id="total-profit" style="color: var(--success);">$0.00</div>
+      </div>
+      <div class="stat-card">
+        <h3>Avg Profit / Flip</h3>
+        <div class="val" id="avg-profit">$0.00</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title">Completed Sales</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>PC Build Name</th>
+            <th>Specs</th>
+            <th>Build Cost</th>
+            <th>Sold Price</th>
+            <th>Net Profit</th>
+            <th>Sale Date</th>
+          </tr>
+        </thead>
+        <tbody id="sales-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
