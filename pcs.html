@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RigFlip - Built PCs</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="pcs">
+  <header>
+    <div class="logo">
+      <h1>🖥️ RigFlip Tracker</h1>
+    </div>
+    <nav>
+      <a href="index.html">Inventory</a>
+      <a href="expenses.html">Expenses</a>
+      <a href="pcs.html">Built PCs</a>
+      <a href="sales.html">Sales History</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h2>Active PC Builds</h2>
+
+    <div class="card">
+      <h3 class="card-title">Add New Build</h3>
+      <form id="pc-form">
+        <div class="form-group">
+          <label>Build Title / Name</label>
+          <input type="text" id="pc-name" placeholder="e.g., Budget 1080p Beast" required>
+        </div>
+        <div class="form-group">
+          <label>Key Specs Summary</label>
+          <input type="text" id="pc-specs" placeholder="e.g., Ryzen 3600 | GTX 1070 | 16GB | 512GB SSD" required>
+        </div>
+        <div class="form-group">
+          <label>Total Build Cost ($)</label>
+          <input type="number" step="0.01" id="pc-cost" placeholder="350.00" required>
+        </div>
+        <div class="form-group">
+          <label>Target List Price ($)</label>
+          <input type="number" step="0.01" id="pc-target" placeholder="500.00" required>
+        </div>
+        <button type="submit">Create Build</button>
+      </form>
+    </div>
+
+    <div class="pcs-grid" id="pcs-grid"></div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
