@@ -4,13 +4,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // ⚠️ PASTE YOUR FIREBASE CONFIG KEYS HERE ⚠️
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+const firebaseConfig = { 
+apiKey: "AIzaSyBadqWqXSnkVGZAOrZfgBfcgsg9xzcboJ4", 
+authDomain: "pctracker-50532.firebaseapp.com", 
+projectId: "pctracker-50532", 
+storageBucket: "pctracker-50532.firebasestorage.app", 
+messagingSenderId: "298603099279", 
+appId: "1:298603099279:web:db825613ff9d94b85eacfa" 
 };
 
 const app = initializeApp(firebaseConfig);
