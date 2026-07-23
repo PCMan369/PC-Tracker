@@ -4,7 +4,7 @@ import {
   getFirestore, collection, addDoc, deleteDoc, doc, updateDoc, onSnapshot 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// ⚠️ PASTE YOUR FIREBASE CONFIG KEYS HERE ⚠️
+// ⚠️ PASTE YOUR FIREBASE CONFIG KEYS HERE ⚠️ --DONE!!
 const firebaseConfig = {
   apiKey: "AIzaSyAn48Mut6wDehwhg_oQsU0BN6YCrEdsIIE",
   authDomain: "pc-tracker-55a5b.firebaseapp.com",
