@@ -1,22 +1,18 @@
-// Import Firebase SDKs directly via Web Modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { 
-  getFirestore, collection, addDoc, deleteDoc, doc, updateDoc, onSnapshot 
+  getFirestore, collection, addDoc, deleteDoc, doc, updateDoc, onSnapshot, getDocs 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// ⚠️ PASTE YOUR FIREBASE CONFIG KEYS HERE ⚠️ --DONE!!
+// ⚠️ PASTE YOUR FIREBASE CONFIG KEYS HERE ⚠️
 const firebaseConfig = {
-  apiKey: "AIzaSyBadqWqXSnkVGZAOrZfgBfcgsg9xzcboJ4",
-  authDomain: "pctracker-50532.firebaseapp.com",
-  projectId: "pctracker-50532",
-  storageBucket: "pctracker-50532.firebasestorage.app",
-  messagingSenderId: "298603099279",
-  appId: "1:298603099279:web:6fc6c8bc95e181535eacfa"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
-
-
-// Initialize Cloud Database
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -24,7 +20,6 @@ function formatCurrency(amount) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount || 0);
 }
 
-// Global Nav & Page Router Initialization
 document.addEventListener('DOMContentLoaded', () => {
   const page = document.body.dataset.page;
   highlightNav();
@@ -44,23 +39,23 @@ function highlightNav() {
   });
 }
 
-/* --- INVENTORY (REALTIME CLOUD SYNC) --- */
+/* --- INVENTORY --- */
 function initInventory() {
   const form = document.getElementById('inventory-form');
   const tbody = document.getElementById('inventory-tbody');
 
-  // Realtime Listener
   onSnapshot(collection(db, "inventory"), (snapshot) => {
     tbody.innerHTML = snapshot.empty 
       ? `<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">No parts in inventory yet.</td></tr>`
       : snapshot.docs.map(docSnap => {
           const item = docSnap.data();
+          const badgeClass = item.status === 'In Stock' ? 'badge-in-stock' : 'badge-testing';
           return `
             <tr>
               <td><strong>${item.name}</strong></td>
               <td>${item.category}</td>
               <td>${formatCurrency(item.cost)}</td>
-              <td><span class="badge badge-in-stock">${item.status}</span></td>
+              <td><span class="badge ${badgeClass}">${item.status}</span></td>
               <td><button class="btn btn-danger" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="deleteInventory('${docSnap.id}')">Delete</button></td>
             </tr>
           `;
@@ -83,7 +78,7 @@ function initInventory() {
   };
 }
 
-/* --- EXPENSES (REALTIME CLOUD SYNC) --- */
+/* --- EXPENSES --- */
 function initExpenses() {
   const form = document.getElementById('expense-form');
   const tbody = document.getElementById('expense-tbody');
@@ -123,11 +118,53 @@ function initExpenses() {
   };
 }
 
-/* --- BUILT PCS & AUTO-TRANSFER --- */
+/* --- BUILT PCS & INVENTORY BUILDER --- */
 function initPCs() {
   const form = document.getElementById('pc-form');
   const container = document.getElementById('pcs-grid');
+  const costInput = document.getElementById('pc-cost');
 
+  // Category mapping for dropdown selectors
+  const categories = ['CPU', 'GPU', 'RAM', 'Storage', 'Motherboard', 'PSU', 'Case'];
+  
+  // Populate Parts Dropdowns from Inventory
+  onSnapshot(collection(db, "inventory"), (snapshot) => {
+    const inStockParts = snapshot.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .filter(p => p.status === 'In Stock');
+
+    categories.forEach(cat => {
+      const selectId = `select-${cat === 'Motherboard' ? 'mobo' : cat.toLowerCase()}`;
+      const selectEl = document.getElementById(selectId);
+      if (!selectEl) return;
+
+      const currentVal = selectEl.value;
+      const catParts = inStockParts.filter(p => p.category === cat);
+
+      selectEl.innerHTML = `<option value="" data-cost="0">-- Manual / None --</option>` +
+        catParts.map(p => `<option value="${p.id}" data-cost="${p.cost}" data-name="${p.name}">${p.name} ($${p.cost})</option>`).join('');
+      
+      selectEl.value = currentVal;
+    });
+  });
+
+  // Calculate total build cost dynamically when picking parts
+  document.querySelectorAll('.part-select').forEach(select => {
+    select.addEventListener('change', recalculateBuildCost);
+  });
+
+  function recalculateBuildCost() {
+    let total = 0;
+    document.querySelectorAll('.part-select').forEach(select => {
+      const selectedOption = select.options[select.selectedIndex];
+      if (selectedOption && selectedOption.dataset.cost) {
+        total += parseFloat(selectedOption.dataset.cost) || 0;
+      }
+    });
+    costInput.value = total.toFixed(2);
+  }
+
+  // Display PCs
   onSnapshot(collection(db, "pcs"), (snapshot) => {
     container.innerHTML = snapshot.empty
       ? `<div class="card" style="grid-column: 1/-1; text-align:center; color: var(--text-muted);">No active PC builds found.</div>`
@@ -140,18 +177,20 @@ function initPCs() {
                 <h3>${pc.name}</h3>
                 <span class="badge badge-${pc.status.toLowerCase()}">${pc.status}</span>
               </div>
-              <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">${pc.specs}</p>
+              <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; white-space: pre-line;">${pc.specs}</p>
               <div style="margin-bottom: 1.2rem; font-size: 0.9rem;">
                 <div><strong>Total Cost:</strong> ${formatCurrency(pc.cost)}</div>
                 <div><strong>Target Price:</strong> ${formatCurrency(pc.targetPrice)}</div>
+                <div><strong>Target Profit:</strong> ${formatCurrency(pc.targetPrice - pc.cost)}</div>
               </div>
-              <div style="display:flex; gap: 0.5rem; align-items: center;">
+              <div style="display:flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
                 <select onchange="updatePCStatus('${id}', this.value)" style="padding: 0.4rem;">
                   <option value="Building" ${pc.status === 'Building' ? 'selected' : ''}>Building</option>
                   <option value="Testing" ${pc.status === 'Testing' ? 'selected' : ''}>Testing</option>
                   <option value="Listed" ${pc.status === 'Listed' ? 'selected' : ''}>Listed</option>
                 </select>
-                <button class="btn btn-success" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;" onclick="markAsSold('${id}', '${pc.name}', '${pc.specs}', ${pc.cost}, ${pc.targetPrice})">Mark Sold</button>
+                <button class="btn btn-success" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;" onclick="markAsSold('${id}', '${pc.name}', \`${pc.specs}\`, ${pc.cost}, ${pc.targetPrice})">Mark Sold</button>
+                <button class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background:#475569; color:#fff;" onclick="copyListingText(\`${pc.name}\`, \`${pc.specs}\`, ${pc.targetPrice})">Copy Listing</button>
                 <button class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;" onclick="deletePC('${id}')">Delete</button>
               </div>
             </div>
@@ -159,15 +198,45 @@ function initPCs() {
         }).join('');
   });
 
+  // Submit New Build
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    const specParts = [];
+    const usedPartIds = [];
+
+    // Gather specs and IDs from selected parts
+    categories.forEach(cat => {
+      const selectId = `select-${cat === 'Motherboard' ? 'mobo' : cat.toLowerCase()}`;
+      const selectEl = document.getElementById(selectId);
+      if (selectEl && selectEl.value) {
+        const option = selectEl.options[selectEl.selectedIndex];
+        specParts.push(`${cat}: ${option.dataset.name}`);
+        usedPartIds.push(selectEl.value);
+      }
+    });
+
+    const manualSpecs = document.getElementById('pc-manual-specs').value;
+    if (manualSpecs) specParts.push(`Extras: ${manualSpecs}`);
+
+    const pcName = document.getElementById('pc-name').value;
+
+    // 1. Add PC Build doc
     await addDoc(collection(db, "pcs"), {
-      name: document.getElementById('pc-name').value,
-      specs: document.getElementById('pc-specs').value,
-      cost: parseFloat(document.getElementById('pc-cost').value),
+      name: pcName,
+      specs: specParts.join(' | '),
+      cost: parseFloat(costInput.value),
       targetPrice: parseFloat(document.getElementById('pc-target').value),
       status: 'Building'
     });
+
+    // 2. Mark assigned inventory items as "Used in Build"
+    for (const partId of usedPartIds) {
+      await updateDoc(doc(db, "inventory", partId), {
+        status: `Used in: ${pcName}`
+      });
+    }
+
     form.reset();
   });
 
@@ -175,7 +244,7 @@ function initPCs() {
     await updateDoc(doc(db, "pcs", id), { status: newStatus });
   };
 
-  // AUTO-MOVE PC TO SALES COLLECTION IN THE CLOUD
+  // Mark Sold Logic
   window.markAsSold = async (id, name, specs, cost, targetPrice) => {
     const soldPriceInput = prompt(`Enter actual sale price for "${name}":`, targetPrice);
     if (soldPriceInput === null) return;
@@ -183,7 +252,6 @@ function initPCs() {
     const soldPrice = parseFloat(soldPriceInput) || 0;
     const profit = soldPrice - cost;
 
-    // 1. Add to Cloud Sales collection
     await addDoc(collection(db, "sales"), {
       name: name,
       specs: specs,
@@ -193,8 +261,14 @@ function initPCs() {
       saleDate: new Date().toLocaleDateString()
     });
 
-    // 2. Delete from active Cloud PCs collection
     await deleteDoc(doc(db, "pcs", id));
+  };
+
+  // Copy Facebook Marketplace / Craigslist Description
+  window.copyListingText = (name, specs, price) => {
+    const text = `🖥️ FOR SALE: ${name}\n💰 Price: ${formatCurrency(price)} (Cash / Venmo / Zelle)\n\nSPECS:\n${specs.split(' | ').join('\n')}\n\n✅ Fully tested, cleaned, and plug-and-play ready!\n📩 Message me if interested or if you have any questions!`;
+    navigator.clipboard.writeText(text);
+    alert('Listing description copied to clipboard!');
   };
 
   window.deletePC = async (id) => {
@@ -215,7 +289,7 @@ function initSales() {
     const totalCount = snapshot.docs.length;
 
     tbody.innerHTML = snapshot.empty
-      ? `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No sales recorded yet. Mark PCs as sold to log them here.</td></tr>`
+      ? `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No sales recorded yet.</td></tr>`
       : snapshot.docs.map(docSnap => {
           const s = docSnap.data();
           totalRev += s.soldPrice || 0;
