@@ -13,7 +13,7 @@
     </div>
     <nav>
       <a href="index.html">Inventory</a>
-      <a href="expenses.html">Expenses</a>
+      <a href="expenses.html">Money Tracker</a>
       <a href="pcs.html">Built PCs</a>
       <a href="sales.html">Sales History</a>
     </nav>
@@ -30,50 +30,29 @@
           <input type="text" id="pc-name" placeholder="e.g., Ultra 1080p Esports Gaming Rig" required>
         </div>
 
-        <div class="form-group">
-          <label>CPU</label>
-          <select id="select-cpu" class="part-select"><option value="">-- Manual / Out of Inventory --</option></select>
-        </div>
-        <div class="form-group">
-          <label>GPU</label>
-          <select id="select-gpu" class="part-select"><option value="">-- Manual / Out of Inventory --</option></select>
-        </div>
-        <div class="form-group">
-          <label>RAM</label>
-          <select id="select-ram" class="part-select"><option value="">-- Manual / Out of Inventory --</option></select>
-        </div>
-        <div class="form-group">
-          <label>Storage</label>
-          <select id="select-storage" class="part-select"><option value="">-- Manual / Out of Inventory --</option></select>
-        </div>
-        <div class="form-group">
-          <label>Motherboard</label>
-          <select id="select-mobo" class="part-select"><option value="">-- Manual / Out of Inventory --</option></select>
-        </div>
-        <div class="form-group">
-          <label>Power Supply</label>
-          <select id="select-psu" class="part-select"><option value="">-- Manual / Out of Inventory --</option></select>
-        </div>
-        <div class="form-group">
-          <label>Case</label>
-          <select id="select-case" class="part-select"><option value="">-- Manual / Out of Inventory --</option></select>
-        </div>
+        <div class="form-group"><label>CPU</label><select id="select-cpu" class="part-select"><option value="">-- Manual / None --</option></select></div>
+        <div class="form-group"><label>GPU</label><select id="select-gpu" class="part-select"><option value="">-- Manual / None --</option></select></div>
+        <div class="form-group"><label>RAM</label><select id="select-ram" class="part-select"><option value="">-- Manual / None --</option></select></div>
+        <div class="form-group"><label>Storage</label><select id="select-storage" class="part-select"><option value="">-- Manual / None --</option></select></div>
+        <div class="form-group"><label>Motherboard</label><select id="select-mobo" class="part-select"><option value="">-- Manual / None --</option></select></div>
+        <div class="form-group"><label>Power Supply</label><select id="select-psu" class="part-select"><option value="">-- Manual / None --</option></select></div>
+        <div class="form-group"><label>Case</label><select id="select-case" class="part-select"><option value="">-- Manual / None --</option></select></div>
 
         <div class="form-group" style="grid-column: 1 / -1;">
-          <label>Manual Specs / Extras (e.g., RGB Fans, Wi-Fi Card)</label>
-          <input type="text" id="pc-manual-specs" placeholder="Optional extra spec details...">
+          <label>Manual Specs / Extras</label>
+          <input type="text" id="pc-manual-specs" placeholder="Optional extra details...">
         </div>
 
         <div class="form-group">
-          <label>Calculated Build Cost ($)</label>
+          <label>Calculated Cost ($)</label>
           <input type="number" step="0.01" id="pc-cost" placeholder="0.00" required>
         </div>
         <div class="form-group">
-          <label>Target List Price ($)</label>
+          <label>Target Price ($)</label>
           <input type="number" step="0.01" id="pc-target" placeholder="500.00" required>
         </div>
 
-        <button type="submit" style="grid-column: 1 / -1;">Create Build & Update Inventory</button>
+        <button type="submit" style="grid-column: 1 / -1;">Create Build & Assign Parts</button>
       </form>
     </div>
 
