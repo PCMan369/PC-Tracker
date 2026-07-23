@@ -6,15 +6,15 @@ import {
 
 // ⚠️ PASTE YOUR FIREBASE CONFIG KEYS HERE ⚠️ --DONE!!
 const firebaseConfig = {
-  apiKey: "AIzaSyAn48Mut6wDehwhg_oQsU0BN6YCrEdsIIE",
-  authDomain: "pc-tracker-55a5b.firebaseapp.com",
-  databaseURL: "https://pc-tracker-55a5b-default-rtdb.firebaseio.com",
-  projectId: "pc-tracker-55a5b",
-  storageBucket: "pc-tracker-55a5b.firebasestorage.app",
-  messagingSenderId: "524228442574",
-  appId: "1:524228442574:web:8a653cd546fa83ee87d39f",
-  measurementId: "G-FG1JB3PWMB"
+  apiKey: "AIzaSyBadqWqXSnkVGZAOrZfgBfcgsg9xzcboJ4",
+  authDomain: "pctracker-50532.firebaseapp.com",
+  projectId: "pctracker-50532",
+  storageBucket: "pctracker-50532.firebasestorage.app",
+  messagingSenderId: "298603099279",
+  appId: "1:298603099279:web:6fc6c8bc95e181535eacfa"
 };
+
+
 
 // Initialize Cloud Database
 const app = initializeApp(firebaseConfig);
